@@ -17,7 +17,11 @@ def start(message):
 
 @bot.message_handler(commands=['help'])
 def help_cmd(message):
-    bot.reply_to(message, "/start - начать\n/help - помощь")
+    bot.reply_to(message, "/start - начать\n/help - помощь\n/about - о боте")
+
+@bot.message_handler(commands=['about'])
+def start(message):
+    bot.reply_to(message, "Автор: Кобзев Дмитрий Константинович\nВерсия: 1.0.0\nНазначение: Напоминание о делах")
 
 if __name__ == "__main__":
     bot.infinity_polling(skip_pending=True)
