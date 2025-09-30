@@ -59,8 +59,10 @@ def start(message):
 def make_main_kb() -> types.ReplyKeyboardMarkup: #Создание клавиатуры
     kb = types.ReplyKeyboardMarkup(resize_keyboard=True)
 
-    kb.row("/about", "Сумма")
-    kb.row("/help", "Погода")
+    kb.row("Максимум", "Сумма")
+    kb.row("/help", "/about")
+    kb.row("/hide", "/show")
+    kb.row("Погода", '/confirm')
 
     return kb
 
@@ -92,14 +94,32 @@ def on_sum_numbers(m: types.Message) -> None:
     if not nums:
         bot.reply_to(m, "Не вижу чисел. Пример: 2 3 10")
     else:
-
         bot.reply_to(m, f"Сумма: {sum(nums)}")
+
+
+@bot.message_handler(func=lambda m: m.text == "Максимум")
+def kb_max(m):
+    bot.send_message(m.chat.id, "Введи числа через пробел или запятую:")
+    bot.register_next_step_handler(m, max_numbers)
+
+def max_numbers(m: types.Message) -> None:
+    nums = parse_ints_from_text(m.text)
+    logging.info("KB-max next step from id=%s text=%r -> %r", m.from_user.id if m.from_user else "?", m.text, nums)
+    logging.info(f'распознаны числа: {nums}')
+    if not nums:
+        bot.reply_to(m, "Не вижу чисел. Пример: 2 3 10")
+    else:
+        bot.reply_to(m, f"Максимум: {max(nums)}")
 
 
 @bot.message_handler(commands=['hide'])
 def hide_kb(m):
     rm = types.ReplyKeyboardRemove()
     bot.send_message(m.chat.id, 'Спрятал клавиатуру', reply_markup=rm)
+
+@bot.message_handler(commands=['show'])
+def hide_kb(m):
+    bot.send_message(m.chat.id, 'Открыл клавиатуру', reply_markup=make_main_kb())
         
 
 @bot.message_handler(commands=['confirm'])
